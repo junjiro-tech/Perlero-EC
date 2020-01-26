@@ -51,7 +51,7 @@
                                     
                                     @foreach($item->photos as $photo)
                                     <td>
-                                    <a href="/items/{{ $item->id }}"><img src="{{ asset('/image/resize_image/' . $photo->image_path) }}" alt=""></a>
+                                    <img src="{{ asset('/image/resize_image/' . $photo->image_path) }}">
                                     </td>
                                     @endforeach
                                     

@@ -58,32 +58,34 @@ class ImagesController extends Controller
             // } else {
             //     $item->image_path = null;  //modelの方で'image_path'が空でも表示できるようにしている
             // }
-    
-    
+            
     public function create(Request $request)
     {
         $this->validate($request, Item::$rules);  //Itemモデルでバリデーションした（item_name,explanation,amount,inventory_control,item_pic_path)
-        // $this->validate($request, ItemPhoto::$rules);
         $form = $request->all(); //$request->all()は全入力を連想配列で取得
         
         $item = new Item(); //新規Itemインスタンス作成
         
+
         // フォームから送信されてきた_tokenを削除する
         unset($form['_token']);
         // フォームから送信されてきたimageを削除する
         unset($form['image_path']);
         // データベースに保存する
+        
         $item->fill($form)->save(); //先にitemのレコードがないと子であるitem_photosは入れられない
+        $dt = Carbon::now()->format('Y-m-d-H:i:s')."." . substr(explode(".", (microtime(true) . ""))[1], 0, 3);
         
         $item_photos = array(); //空の配列用意
             for($i=1; $i<=4; $i++){ 
             $file_name = "image_path".$i; //images_path1～4を準備して$file_nameに代入
                   if(isset($request->$file_name)){ //issetは変数に値がセットされているか確認する方法、つまり$file_nameに'image_path'があるか確認している
                       $files = $request->file($file_name); //file('読み込みたい変数、カラムなど文字列ならok') 
-                      $path = $request->$file_name->store('public/image'); //画像をストレージに保存
+                      $path = $request->$file_name->storeAs('public/image', $file_name.$dt.'.png'); //画像をストレージに保存
+                      
                       $item->image_path = basename($path);
                       $item_photo = new ItemPhoto(); //ItemPhotoインスタンス作成
-                      $item_photo->fill(["image_path"=>$file_name]);
+                      $item_photo->fill(["image_path"=>$file_name.$dt.'.png']);
                       $item_photos[] = $item_photo; //各item_photoを用意した$item_photosに代入する
                       InterventionImage::make($files)->resize(100, 100)->save(public_path()."/image/resize_image/". $item_photo->image_path);
                   }
@@ -94,6 +96,47 @@ class ImagesController extends Controller
         }
         return redirect('admin/images/create')->with('flash_message', '商品を追加しました');
     }
+        
+    
+    
+    // public function create(Request $request)
+    // {
+    //     $this->validate($request, Item::$rules);  //Itemモデルでバリデーションした（item_name,explanation,amount,inventory_control,item_pic_path)
+    //     // $this->validate($request, ItemPhoto::$rules);
+    //     $form = $request->all(); //$request->all()は全入力を連想配列で取得
+        
+    //     $item = new Item(); //新規Itemインスタンス作成
+        
+    //     // フォームから送信されてきた_tokenを削除する
+    //     unset($form['_token']);
+    //     // フォームから送信されてきたimageを削除する
+    //     unset($form['image_path']);
+    //     // データベースに保存する
+    //     $item->fill($form)->save(); //先にitemのレコードがないと子であるitem_photosは入れられない
+        
+    //     $item_photos = array(); //空の配列用意
+    //         for($i=1; $i<=40; $i++){ 
+    //             //商品idをファイル名に含めてやる
+    //         $item_id = ItemPhoto::where('item_id', $request->item_id)->get();
+    //         $file_name = "image_path".$i; //images_path1～4を準備して$file_nameに代入
+    //               if(isset($request->$file_name)){ //issetは変数に値がセットされているか確認する方法、つまり$file_nameに'image_path'があるか確認している
+    //                   $files = $request->file($file_name); //file('読み込みたい変数、カラムなど文字列ならok') 
+                      
+    //                   //storeAs('', '保存ディレクトリ', '保存新ファイル名')
+    //                   $path = $request->$file_name->storeAs("image_path".$i, 'public/image', $item_id.'.'.'png'); //画像をストレージに保存
+    //                   $item->image_path = basename($path);
+    //                   $item_photo = new ItemPhoto(); //ItemPhotoインスタンス作成
+    //                   $item_photo->fill(["image_path"=>$file_name.$i]);
+    //                   $item_photos[] = $item_photo; //各item_photoを用意した$item_photosに代入する
+    //                   InterventionImage::make($files)->resize(100, 100)->save(public_path()."/image/resize_image/". $item_photo->image_path);
+    //               }
+    //         }
+    //     if (!empty($item_photos))
+    //     {
+    //         $item->photos()->saveMany($item_photos);//photos()の所は親(Itemモデル)のphotos()アクションでリレーションしているためphotos()を使う
+    //     }
+    //     return redirect('admin/images/create')->with('flash_message', '商品を追加しました');
+    // }
     
     
     

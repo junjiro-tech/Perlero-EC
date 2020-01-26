@@ -8,6 +8,7 @@ use App\Item;
 use App\Uuid;
 use App\CartItem;
 use storage;
+use App\ItemPhoto;
 
 class ItemController extends Controller
 {
@@ -18,6 +19,7 @@ class ItemController extends Controller
         if($request->has('keyword')) {
         // SQLのlike句でitemsテーブルを検索する
             $items = Item::where('item_name', 'like', '%'.$request->get('keyword').'%')->paginate(16);
+            $items = ItemPhoto::where('image_path');
         } else {
             $items = Item::paginate(16);  //Item::pagenate(16);でitemsテーブルに保存されている商品情報を20個ずつ取り出す
         }

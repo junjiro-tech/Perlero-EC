@@ -11,9 +11,11 @@
         @foreach($items as $item) <!-- コントローラーで受け取ったitemsから商品情報を1つずつ取り出して表示する事ができる -->
         <div class="col-md-3.5 mb-2 mr-4 mb-5">
             <div class="card">
+                @foreach($item->photos as $photo)
                 <div class="card-picture">
-                    <a href="/items/{{ $item->id }}"><img src="{{ asset('storage/image/' . $item->image_path) }}" alt=""></a>
+                    <a href="/items/{{ $item->id }}"><img src="{{ asset('storage/image/' . $photo->image_path) }}"></a>
                 </div>              
+                @endforeach
                 <div class="card-header">
                     {{ $item->item_name }} 
                 </div>

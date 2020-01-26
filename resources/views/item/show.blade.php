@@ -10,10 +10,12 @@
                     <!-- スライドさせる画像の設定 -->
                     <div class="carousel-inner">
                         
+                    @foreach($item->photos as $photo)
                     </div><!-- /.carousel-inner -->
                         <div class="card-picture">
-                            <img src="{{ asset('storage/image/' . $item->image_path) }}" alt="">
+                            <img src="{{ asset('storage/image/' . $photo->image_path) }}" alt="">
                         </div>
+                    @endforeach
                     <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="sr-only">前へ</span>
